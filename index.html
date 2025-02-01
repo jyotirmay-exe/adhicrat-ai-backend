@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindi to English Translator</title>
+</head>
+<body>
+    <style>
+        *{
+            font-family: "Ubuntu Mono", monospace;
+        }
+    </style>
+    <h1>Hindi to English</h1>
+    <input type="text" id="field" placeholder="Enter text in Hindi" style="width: 500px;"><br> <br>
+    <button onclick="generateText()">Generate</button>
+    <button onclick="translateText()">Translate</button>
+    
+    <h3>Translation:</h3>
+    <p id="output"></p>
+    <br><br>
+    <hr>
+    <br>
+    <h1>Content:</h1>
+    <input type="text" id="occasion" placeholder="Occasion (ex: Wedding, Funeral, Graduation)" style="width: 500px;">
+    <input type="text" id="audience" placeholder="Audience: (ex: Academics, Business professionals)" style="width: 500px;"> <br> <br>
+    <input type="text" id="purpose" placeholder="Purpose: (ex: to persuade, to inform, to inspire, to entertain)" style="width: 500px;">
+    <input type="text" id="desiredImpact" placeholder="Desired Impact: (ex: emotional, call to action, increased awareness)" style="width: 500px;"> <br> <br>
+    <input type="text" id="speakerRole" placeholder="Desired Tone & Style: (ex: formal, informal, inspirational, humorous)" style="width: 500px;">
+    <input type="text" id="duration" placeholder="Length: (approx. in mins)" style="width: 500px;">
+    <br> <br>
+    <button onclick="genSpeech()">Generate Speech</button>
+    <p id="content"></p>
+
+    <script>
+        async function translateText() {
+            const field = document.getElementById("field").value;
+            const output = document.getElementById("output");
+
+            output.innerText = "Translating...";
+
+            const response = await fetch("http://localhost:3000/translate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: field })
+            });
+
+            const data = await response.json();
+            output.innerText = data.response || "Error...";
+        }
+
+        async function generateText() {
+            const field = document.getElementById("field");
+            const output = document.getElementById("output");
+            field.value = "Generating...";
+
+            const response = await fetch("http://localhost:3000/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: field })
+            });
+
+            const data = await response.json();
+            field.value = data.response || "Error...";
+        }
+
+        async function genSpeech() {
+            const output = document.getElementById("content");
+            output.innerText = "Generating...";
+
+            const occasion = document.getElementById("occasion").value;
+            const audience = document.getElementById("audience").value;
+            const purpose = document.getElementById("purpose").value;
+            const desiredImpact = document.getElementById("desiredImpact").value;
+            const speakerRole = document.getElementById("speakerRole").value;
+            const duration = document.getElementById("duration").value;
+
+            if (!occasion || !audience || !purpose || !desiredImpact || !speakerRole || !duration) {
+                output.innerText = "Please fill in all fields!";
+                return;
+            }
+
+            const response = await fetch("http://localhost:3000/generateSpeech", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ occasion, audience, purpose, desiredImpact, speakerRole, duration })
+            });
+
+            let data = await response.json();
+            output.innerText = data.response.replaceAll("*", "") || "Failed to generate speech.";
+        }
+
+    </script>
+</body>
+</html>

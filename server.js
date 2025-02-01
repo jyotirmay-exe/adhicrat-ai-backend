@@ -12,7 +12,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(morgan("combined"));
+// app.use(morgan("combined"));
 app.use(express.json()); 
 
 
